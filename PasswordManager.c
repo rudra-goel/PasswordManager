@@ -6,6 +6,9 @@
 
 void accessReccords(char path[256]);
 void enterReccord(char path[256]);
+void encryptReccord(char reccorc[256]);
+void decryptReccord(char reccorc[256]);
+bool checkEntry(char buffer[256]);
 
 
 int main(){
@@ -14,13 +17,13 @@ int main(){
     system("clear");
     printf("\n----------------------------------------------------------------");
     printf("\n|                                                              |");
-    printf("\n|\t\tWelcome to Password Manager.\t\t       |\n");
+    printf("\n|\t\tWelcome to Password Manager\t\t       |\n");
     printf("|                                                              |");
-    char path[] = "/Users/rgoel/downloads/passwords.txt";
+    char path[] = "/Users/rgoel/desktop/passwords.txt";
     while(condition){
         char answer[50];
         printf("\n----------------------------------------------------------------\n");
-        printf("|\t\t   Choose an option below.\t\t       |");
+        printf("|\t\t   Choose an Option Below\t\t       |");
         printf("\n----------------------------------------------------------------\n");
         printf("|  Access your stored passwords (a)");
         printf("\n|  Enter new password (e)");
@@ -34,6 +37,7 @@ int main(){
         } else if(strcmp(answer, "e") == 0){
             enterReccord(path);
         } else if (strcmp(answer, "q") == 0){
+            system("clear");
             condition = false;
         }
     }
@@ -51,6 +55,7 @@ void accessReccords(char path[256]){
         const unsigned MAX_LENGTH = 256;
         char buffer[MAX_LENGTH];
         while (fgets(buffer, MAX_LENGTH, fptr)){
+            decryptReccord(buffer);
             printf("\n");
             printf("--> %s", buffer);
             
@@ -70,6 +75,7 @@ void enterReccord(char path[256]){
         char userName[50];
         char password[50];
         char buffer[256];
+        char confirm[50];
 
         printf("\nEnter the name of this reccord >>> ");
         scanf("%s", reccordName);
@@ -81,12 +87,54 @@ void enterReccord(char path[256]){
         scanf("%s", password);
 
         sprintf(buffer, "%s: username=\"%s\" | password=\"%s\"", reccordName, userName, password);
+
+        while(checkEntry(buffer) == false){
+            printf("\nEnter the name of this reccord >>> ");
+            scanf("%s", reccordName);
+            
+            printf("Username >>> ");
+            scanf("%s", userName);
+            
+            printf("Password >>> ");
+            scanf("%s", password);
+
+            sprintf(buffer, "%s: username=\"%s\" | password=\"%s\"", reccordName, userName, password);
+        }
+
+        encryptReccord(buffer);
+
         fprintf(fptr, "\n");
         fprintf(fptr, buffer);
-
+        decryptReccord(buffer);
         printf("\nEntered reccord %s ", buffer);
 
     }
     printf("\n");
     fclose(fptr);
+}
+
+void encryptReccord(char reccord[256]){
+    
+    for(int i = 0; i < strlen(reccord); i++){
+        reccord[i] = reccord[i]+100;
+    }
+
+}
+void decryptReccord(char reccord[256]){
+    
+    for(int i = 0; i < strlen(reccord); i++){
+        reccord[i] = reccord[i]-100;
+    }
+
+}
+
+bool checkEntry(char buffer[256]){
+    char confirm[50];
+    printf("Correct (enter)/Incorrect (q)? %s\n>>> ", buffer);
+    scanf("%s", confirm);
+
+    if(strcmp(confirm, "q") == 0){
+        return false;
+    }
+    return true;
 }
