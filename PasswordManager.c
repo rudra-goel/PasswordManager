@@ -15,6 +15,8 @@ int main(){
 
     bool condition = true;
     system("clear");
+    system("swift /Users/rgoel/Downloads/pass-mgr/Authenticate.swift");
+    
     printf("\n----------------------------------------------------------------");
     printf("\n|                                                              |");
     printf("\n|\t\tWelcome to Password Manager\t\t       |\n");
