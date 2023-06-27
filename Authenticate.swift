@@ -1,49 +1,68 @@
 import LocalAuthentication
-
-func auth(){
-
-    var context = LAContext()
+import Cocoa
 
 
-    var biometry = context.biometryType
-    var error: NSError?
+let context = LAContext()
 
-    // Check for biometric authentication 
-    // permissions
-    var permissions = context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
+var error: NSError?
 
-    if permissions {
-        // Proceed to authentication
-        print("Happy Access")
-        let reason = "Log in with Touch ID"
-        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { 
-                success, evaluateError in
-                    
-                    if success {
-                        
-                        //TODO: User authenticated successfully, take appropriate action
-                        print("Cum")
-                        
-                    } else {
-                        //TODO: User did not authenticate successfully, look at error and take appropriate action
-                        print("No Cum")
-                        guard let error = evaluateError else {
-                            print("err")
-                            return
-                        }
-                    }
-
-                    print("bad")
-                        
-        }
+extension String {
+    func fileName() -> String {
+        return URL(fileURLWithPath: self).deletingPathExtension().lastPathComponent
     }
-    else {
-        print("No Access")
-        // Handle permission denied or error
+
+    func fileExtension() -> String {
+        return URL(fileURLWithPath: self).pathExtension
+    }
+}
+
+guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
+    print(error?.localizedDescription ?? "Can't evaluate policy")
+    throw NSError()
+}
+
+func genAuthKey(outputFile: String, key: String){
+    let fileExtension = outputFile.fileExtension()
+    let fileName = outputFile.fileName()
+
+    //get file url
+    let fileUrl = try! FileManager.default.url(for: .desktopDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+    let ooutputFile = fileUrl.appendingPathComponent(fileName).appendingPathExtension(fileExtension)
+    //save data
+    guard let data = key.data(using: .utf8) else {
+        print("Failed to generate authentication key")
+        return
+    }
+
+    do {
+        guard let url = URL(string: outputFile) else {
+            print("URL CONVERSION ERROR")
+            return
+        }
+        try data.write(to: url)
+        print("Authentication key generated")
+    } catch {
+        print(error.localizedDescription)
+        
     }
 
 }
 
-auth()
 
+let authenticate = Task {
+    do {
+        try await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: "Log in to your account")
+
+        genAuthKey(outputFile: "/Users/rgoel/Downloads/pass-mgr/AuthKey.txt", key: "Cum")
+        return true
+    } catch let error {
+        print(error.localizedDescription)
+        return false
+
+        // Fall back to a asking for username and password.
+        // ...
+    }
+}
+
+print(await authenticate.value)
 

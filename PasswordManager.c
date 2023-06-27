@@ -14,9 +14,9 @@ bool checkEntry(char buffer[256]);
 int main(){
 
     bool condition = true;
-    system("swift Cum.swift");
-
-    //system("clear");
+    system("clear");
+    system("swift /Users/rgoel/Downloads/pass-mgr/Authenticate.swift");
+    
     printf("\n----------------------------------------------------------------");
     printf("\n|                                                              |");
     printf("\n|\t\tWelcome to Password Manager\t\t       |\n");
